@@ -8,12 +8,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Preuzmi Minecraft Server i Cloudflare
+      - name: Postavi Javu 25 i Cloudflare
         run: |
           sudo apt-get update
-          sudo apt-get install -y openjdk-21-jre-headless jq
+          sudo apt-get install -y openjdk-25-jre-headless jq || sudo apt-get install -y openjdk-23-jre-headless jq
           
-          # Automatski preuzmi najnoviji Minecraft Server.jar
+          # Preuzmi najnoviji Minecraft Server.jar
           MC_URL=$(curl -s https://launchermeta.mojang.com/mc/game/version_manifest.json | jq -r '.latest.release as $latest | .versions[] | select(.id == $latest) | .url' | xargs curl -s | jq -r '.downloads.server.url')
           wget -O server.jar "$MC_URL"
           
