@@ -1,17 +1,26 @@
-name: Moj Prvi Action
+name: Minecraft Server Runner
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
-  run-script:
+  run-minecraft:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Preuzmi Minecraft Server & Ngrok
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-21-jre-headless
+          wget -O server.jar https://piston-data.mojang.com/v1/objects/450698c1863ab818453d1b7484d642eaa1b7d21b/server.jar
+          echo "eula=true" > eula.txt
+          curl -s https://bin.equinox.io/c/bTs42UX322m/ngrok-v3-stable-linux-amd64.tgz | tar -xzf -
 
-      - name: Print message
-        run: echo "GitHub Action radi uspješno!"
+      - name: Pokreni Minecraft Server (6GB RAM)
+        run: |
+          ./ngrok tcp 25565 --log=stdout > ngrok.log &
+          sleep 5
+          echo "=== TVOJA IP ADRESA ZA SPAJANJE ==="
+          curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"tcp://[^"]*'
+          echo "==================================="
+          java -Xmx6G -Xms4G -jar server.jar nogui
